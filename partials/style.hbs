@@ -1,0 +1,69 @@
+{{> palette}}
+<style>
+	body{
+		background-color: var(--bg-color);
+		color: var(--neutral-color);
+		font-family: var(--font-family);
+		font-size: var(--font-size);
+		line-height: var(--line-height);
+		padding: var(--body-v-margin) var(--body-h-margin);
+	}
+	body h1,
+	body h2,
+	body h3,
+	body h4,
+	body h5,
+	body h6{
+		margin-left: calc(-1 * var(--tab-size));
+	}
+	h1{
+		padding-top: var(--line-height);
+	}
+	#title{
+		padding-top: 0px;
+	}
+	a{
+		color: var(--tinged-white-accent-color);
+		text-decoration: none;
+	}
+
+	p{
+		margin: var(--p-v-margin) var(--p-h-margin);
+	}
+	.metadata-footer{
+		text-align: right;
+		font-size: 90%;
+		color: var(--neutral-lowlight-color);
+	}
+
+	table {
+		border-collapse: collapse;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	thead {
+		border-bottom: 2px solid var(--neutral-lowlight-color);
+	}
+	tfoot {
+		border-top: 2px solid var(--neutral-lowlight-color);
+	}
+	td, th {
+		padding: 0.5rem;
+		border: 1px var(--medium-neutral-color) solid;
+	}
+	th {
+		background-color: var(--bg-highlight-color);
+	}
+	tbody tr:nth-child(even) {
+		background-color: var(--bg-highlight-color);
+	}
+	img{
+		max-width: 100%;
+	}
+	@media (orientation: landscape){
+		body{
+			max-width: 930px;/*Remember that CSS!px is actually a meatspace unit that is independent of actual pixel size on hi-dpi screens*/
+			margin: 0 auto;
+		}
+	}
+</style>

@@ -1,0 +1,24 @@
+{{!< default}}
+{{> titlecard}}
+{{> postcard}}
+
+<a class="titlecard" href="{{@blog.url}}">
+	<span class="title">GIANCARLO SARACENI</span><img class="blog-logo" src="{{@blog.logo}}" alt="GHS💜"/>
+</a>
+
+{{#foreach posts}}
+	<div class="postcard">
+		<a class="post-image-link" href="{{{url}}}"><img class="postcard-image" src="{{{feature_image}}}"></a>
+		<div class="postcard-text">
+			<header class="post-title">
+				<a href="{{{url}}}">{{title}}</a>
+			</header>
+			<div class="post-details">
+				<div class="post-excerpt">{{excerpt words="10"}}</div>
+				<div class="post-date-container">
+					<time class="post-date" datetime="{{date format="YYYY-MM-DD"}}">{{date format='YYYY-MM-DD'}}</time>
+				</div>
+			</div> 
+		</div>
+	</div>
+{{/foreach}}

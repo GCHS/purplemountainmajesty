@@ -1,0 +1,153 @@
+<script>
+{//greet the user: https://www.youtube.com/watch?v=65Gf6rlBQ-w
+	let hourHand = new Date().getHours();
+	if(hourHand >= 6 && hourHand < 12){
+		console.log("Good morning!");
+	}else if(hourHand >= 12 && hourHand < 18){
+		console.log("Good afternoon!");
+	}else if(hourHand >= 18){
+		console.log("Good evening!");
+	}else if(hourHand < 6){
+		console.log("Insomnia, huh?");
+	}
+}
+
+document.querySelectorAll(".footnote-ref").forEach(fillFootnoteTag);
+window.onclick = ()=>{document.querySelectorAll(".footnote").forEach(hideFootnote)};//nested footnotes are instantiated on demand, which is why they're requeried
+//nested footnotes are done on demand because I make directed cyclic graphs out of them.
+//you've been warned.
+{
+	let footnotes = document.querySelector(".footnotes");
+	if(footnotes)
+		footnotes.classList.add("collapsed");//they're redundant now; hide them
+}
+
+function hideFootnote(f){
+	f.querySelectorAll(".popup").forEach(hidePopup)
+}
+function hidePopup(p){
+	p.classList.remove(
+		"visible", "show-above", "show-below", "show-left", "show-right", "skinny"
+	);
+}
+
+function hideSiblingFootnotes(f){
+	//walk up DOM to find the enclosing footnote or body and then hide all the footnotes in it that aren't this one (footnotes aren't supposed to spawn with visible child footnotes)
+	let ancestor = f.parentNode;
+	for(; !(ancestor.classList && ancestor.tagName === "BODY" || ancestor.classList.contains("footnote")); ancestor = ancestor.parentNode);
+	ancestor.querySelectorAll(".footnote").forEach(footnote =>{
+		if(footnote != f){
+			hideFootnote(footnote);
+		}
+	});
+}
+
+function hideVisibleChildPopupsXorContainingPopup(e){
+	//child popups should only be visible if this popup is visible
+	//if they are, hide them
+	let visibleChildPopups = e.currentTarget.querySelectorAll(".visible");
+	if(visibleChildPopups.length){
+		visibleChildPopups.forEach(hidePopup);
+	}else{
+		hidePopup(e.currentTarget.parentNode);
+	}
+	e.stopPropagation();
+}
+function footnoteToggler(e){
+	popup = e.currentTarget.querySelector(".popup");
+	if(popup.classList.toggle("visible")){
+		hideSiblingFootnotes(e.currentTarget);
+		showPopup(popup);
+	}else{
+		popup.classList.remove("show-above", "show-below", "show-left", "show-right");		
+	}
+	e.stopPropagation();
+}
+function togglePopup(popup){
+	if(popup.classList.toggle("visible")){
+		showPopup(popup);
+	}else{
+		popup.classList.remove("show-above", "show-below", "show-left", "show-right");
+	}
+}
+
+function showPopup(popup){
+	popup.classList.add("show-above", "show-right");
+	let windowCoordBoundingBox = popup.getBoundingClientRect();
+
+	refitAbovePopup(popup, windowCoordBoundingBox);
+	refitRightPopup(popup, windowCoordBoundingBox);
+
+	if(popup.getBoundingClientRect().left < 0){//if it /still/ doesn't fit, make it narrow.
+		popup.classList.add("skinny");
+	}
+	windowCoordBoundingBox = popup.getBoundingClientRect();//popup dimensions have changed
+	refitAbovePopup(popup, windowCoordBoundingBox);//skinny popups are taller, so retest for vertical fit
+	refitLeftPopup(popup, windowCoordBoundingBox);//just in case
+}
+function refitAbovePopup(popup, boundingBox){
+	if(boundingBox.top < 0){
+		popup.classList.remove("show-above");
+		popup.classList.add("show-below");
+	}
+}
+function refitBelowPopup(popup, boundingBox){
+	if(boundingBox.bottom > (window.innerHeight || document.documentElement.clientHeight)){
+		popup.classList.remove("show-below");
+		popup.classList.add("show-above");
+	}
+}
+function refitRightPopup(popup, boundingBox){
+	if(boundingBox.right > (window.innerWidth || document.documentElement.clientWidth)){
+		popup.classList.remove("show-right");
+		popup.classList.add("show-left");
+	}
+}
+function refitLeftPopup(popup, boundingBox){
+	if(boundingBox.left < 0){
+		popup.classList.remove("show-left");
+		popup.classList.add("show-right");
+	}
+}
+
+function nestedFootnoteFiller(e){
+	fillFootnoteTag(e.currentTarget);
+	footnoteToggler(e);
+}
+
+function fillFootnoteTag(tag){
+	tag.classList.add("footnote");
+	let footernote = document.getElementById(tag.childNodes[0].getAttribute("href").substring(1));
+
+	unanchorTag(tag);
+
+	let popup = document.createElement("span");
+	popup.classList.add("popup");
+	popup.appendChild(document.createElement("architects-line"));
+	let content = document.createElement("div");
+	content.classList.add("popup-content");
+	content.onclick = hideVisibleChildPopupsXorContainingPopup;
+	footernote.childNodes.forEach(node => {
+		content.appendChild(node.cloneNode(true));
+	});
+	content.querySelectorAll(".footnote").forEach(hideFootnote);
+	popup.appendChild(content);
+	popup.querySelectorAll(".footnote-ref").forEach(f => {
+		unanchorTag(f);
+		f.onclick = nestedFootnoteFiller;
+	});
+	popup.querySelectorAll(".footnote-backref").forEach(backref => {backref.remove();});
+	tag.appendChild(popup);
+	tag.onclick = footnoteToggler;
+}
+
+function unanchorTag(tag){ //replace a fragment link with its text to not send the user flying all over the page
+	if(tag.firstChild.tagName === "A"){
+		let footnotation = document.createElement("span");
+		footnotation.textContent = tag.firstChild.text;
+		footnotation.setAttribute("href", tag.firstChild.getAttribute("href"));
+		footnotation.classList.add("footnotation");
+		tag.replaceChild(footnotation, tag.firstChild);
+	}
+}
+</script>

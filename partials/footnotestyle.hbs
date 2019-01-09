@@ -1,0 +1,100 @@
+<style>
+	:root{
+		--d: 20px;/*the side length of the bounding box of the diagonal portion of the architect's lines*/
+		--d-th: 1.6px; /*the thickness of the diagonal line. Thicker than horizontal to match visual weight.*/
+		--h-th: 1px; /*the thickness of the horizontal line*/
+		--h: 30px; /*the length of horizontal line before the text starts*/
+	}
+	.footnote{
+		position: relative;
+		display: inline-block;
+	}
+	.footnotation{
+		color: var(--tinged-white-accent-color);
+		cursor: pointer;
+	}
+
+	.popup{
+		display: none;
+		position: absolute;
+	}
+	.popup.visible{
+		display: flex;
+	}
+	.popup p:first-child{
+		margin-top: 1ch;
+	}
+	.popup p:last-child{
+		margin-bottom: 1ch;
+	}
+	architects-line{
+		border-style: solid;
+		border-color: var(--extra-bright-accent-color);
+
+		height: var(--d);
+
+		position: relative;
+		display: inline-block;
+	}
+	.popup > .popup-content{
+		background-color: var(--dark-accent-color);
+		padding-left: 1ch;
+		padding-right: 1ch;
+		min-width: 20em;
+	}
+	.popup.skinny > .popup-content{
+		min-width: 0;
+		--h: 10px;
+	}
+
+	.popup.show-right{
+		left: calc(1ch + 0.5 * var(--d));
+	}
+	.popup.show-left{
+		right: calc(1ch + 0.5 * var(--d));
+	}
+	.popup.show-below{
+		top: 1em;
+		flex-direction: column;
+	}
+	.popup.show-above{
+		bottom: 1em;
+		flex-direction: column-reverse;
+	}
+
+	.popup.show-right > architects-line{
+		border-right-width: 0;
+		border-left-width: var(--d-th);
+	}
+	.popup.show-left > architects-line{
+		border-left-width: 0;
+		border-right-width: var(--d-th);
+	}
+	.popup.show-below > architects-line{
+		border-bottom-width: var(--h-th);
+		border-top-width: 0;
+	}
+	.popup.show-above > architects-line{
+		border-top-width: var(--h-th);
+		border-bottom-width: 0;
+	}
+	.popup.show-below.show-right > architects-line, .popup.show-above.show-left > architects-line{
+		transform: skewX(45deg);
+	}
+	.popup.show-below.show-left > architects-line, .popup.show-above.show-right > architects-line{
+		transform: skewX(-45deg);
+	}
+
+	.popup.show-right > .popup-content {
+		margin-left: calc(var(--d) + var(--h));
+		transform: translateX(calc(0.5 * (var(--d) + var(--h-th)))); /*compensate for skew kicking out the bottom of the line*/
+	}
+	.popup.show-left > .popup-content {
+		margin-right: calc(var(--d) + var(--h));
+		transform: translateX(calc(-0.5 * (var(--d) + var(--h-th)))); /*compensate for skew kicking out the bottom of the line*/
+	}
+
+	.footnotes.collapsed{
+		display: none;
+	}
+</style>

@@ -1,0 +1,12 @@
+{{!< default}}
+{{> footnotestyle}}
+{{#post}}
+<h1 id="title">{{title}}</h1>
+<div id="content">
+{{content}}
+</div>
+<div class="metadata-footer">
+	<time datetime="{{date format="YYYY-MM-DD"}}" itemprop="datePublished">{{date format='YYYY-MM-DD'}}</time>
+</div>
+{{/post}}
+{{> postscript}}
