@@ -92,13 +92,13 @@ function refitAbovePopup(popup, boundingBox){
 	}
 }
 function refitBelowPopup(popup, boundingBox){
-	if(boundingBox.bottom > (window.innerHeight || document.documentElement.clientHeight)){
+	if(boundingBox.bottom > (window.visualViewport? window.visualViewport.height : (window.innerHeight || document.documentElement.clientHeight))){
 		popup.classList.remove("show-below");
 		popup.classList.add("show-above");
 	}
 }
 function refitRightPopup(popup, boundingBox){
-	if(boundingBox.right > (window.innerWidth || document.documentElement.clientWidth)){
+	if(boundingBox.right > (window.visualViewport? window.visualViewport.width : (window.innerWidth || document.documentElement.clientWidth))){
 		popup.classList.remove("show-right");
 		popup.classList.add("show-left");
 	}
