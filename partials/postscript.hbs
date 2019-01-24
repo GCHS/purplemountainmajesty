@@ -27,7 +27,7 @@ function hideFootnote(f){
 }
 function hidePopup(p){
 	p.classList.remove(
-		"visible", "show-above", "show-below", "show-left", "show-right", "skinny"
+		"visible", "show-above", "show-below", "show-left", "show-right", "shorter-horizontal-line", "skinny"
 	);
 }
 
@@ -62,22 +62,16 @@ function footnoteToggler(e){//called when the footnote tag, `[n]`, is clicked
 			hideSiblingFootnotes(e.currentTarget);
 			showPopup(popup);
 		}else{
-			popup.classList.remove("show-above", "show-below", "show-left", "show-right");
+			hidePopup(popup);
 		}
 	}
 	e.stopPropagation();
 }
-function togglePopup(popup){
-	if(popup.classList.toggle("visible")){
-		showPopup(popup);
-	}else{
-		popup.classList.remove("show-above", "show-below", "show-left", "show-right");
-	}
-}
 
 function showPopup(popup){
 	popup.classList.add("show-above", "show-right");
-	fitPopupVertically(popup, fitPopupHorizontally(popup));
+	fitPopupHorizontally(popup);
+	fitPopupVertically(popup);
 }
 
 function fitPopupHorizontally(popup){
@@ -91,19 +85,28 @@ function fitPopupHorizontally(popup){
 		if(boundingBox.left - boundingBox.width >= 0){//if it will fit in the viewport if it points to the left, point it to the left
 			popup.classList.remove("show-right");
 			popup.classList.add("show-left");
-		}else{//if it doesn't fit, make it skinny
-			popup.classList.add("skinny");
+		}else{//if it doesn't fit, shorten the architects-line's horizontal
+			popup.classList.add("shorter-horizontal-line");
 			boundingBox = popup.firstElementChild.getBoundingClientRect();
-			if(boundingBox.right > viewportWidth && boundingBox.left - boundingBox.width >= 0){//if it will /only/ fit in the viewport if it points to the left, point it to the left
-				popup.classList.remove("show-right");
-				popup.classList.add("show-left");
-			}//otherwise, leave it pointing right; even if it doesn't fit, being off on the right side of the page allows the user to scroll to see the rest of it
+			if(boundingBox.right > viewportWidth){
+				if(boundingBox.left - boundingBox.width >= 0){//if it will fit in the viewport if it points to the left, point it to the left
+					popup.classList.remove("show-right");
+					popup.classList.add("show-left");
+				}else{//if it /still/ doesn't fit, make it skinny
+					popup.classList.add("skinny");
+					boundingBox = popup.firstElementChild.getBoundingClientRect();
+					if(boundingBox.right > viewportWidth && boundingBox.left - boundingBox.width >= 0){//if it will /only/ fit in the viewport if it points to the left, point it to the left
+						popup.classList.remove("show-right");
+						popup.classList.add("show-left");
+					}//otherwise, leave it pointing right; even if it doesn't fit, being off on the right side of the page allows the user to scroll to see the rest of it
+				}
+			}
 		}
 	}
-	return boundingBox;
 }
 
-function fitPopupVertically(popup, boundingBox){
+function fitPopupVertically(popup){
+	let boundingBox = popup.getBoundingClientRect();
 	if(boundingBox.top < 0){
 		popup.classList.remove("show-above");
 		popup.classList.add("show-below");
