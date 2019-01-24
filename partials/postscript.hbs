@@ -62,7 +62,7 @@ function footnoteToggler(e){//called when the footnote tag, `[n]`, is clicked
 			hideSiblingFootnotes(e.currentTarget);
 			showPopup(popup);
 		}else{
-			popup.classList.remove("show-above", "show-below", "show-left", "show-right");		
+			popup.classList.remove("show-above", "show-below", "show-left", "show-right");
 		}
 	}
 	e.stopPropagation();
@@ -77,41 +77,34 @@ function togglePopup(popup){
 
 function showPopup(popup){
 	popup.classList.add("show-above", "show-right");
-	let windowCoordBoundingBox = popup.getBoundingClientRect();
-
-	refitAbovePopup(popup, windowCoordBoundingBox);
-	refitRightPopup(popup, windowCoordBoundingBox);
-
-	if(popup.getBoundingClientRect().left < 0){//if it /still/ doesn't fit, make it narrow.
-		popup.classList.add("skinny");
-	}
-	windowCoordBoundingBox = popup.getBoundingClientRect();//popup dimensions have changed
-	refitAbovePopup(popup, windowCoordBoundingBox);//skinny popups are taller, so retest for vertical fit
-	refitLeftPopup(popup, windowCoordBoundingBox);//just in case
+	fitPopupVertically(popup, fitPopupHorizontally(popup));
 }
-function refitAbovePopup(popup, boundingBox){
+
+function fitPopupHorizontally(popup){
+	let boundingBox = popup.getBoundingClientRect();
+	let viewportWidth = window.visualViewport? window.visualViewport.width : (window.innerWidth || document.documentElement.clientWidth);
+	//if it's off the right of the viewport, we've got work to do
+	if(boundingBox.right > viewportWidth){
+		if(boundingBox.left - boundingBox.width >= 0){//if it will fit in the viewport if it points to the left, point it to the left
+			popup.classList.remove("show-right");
+			popup.classList.add("show-left");
+		}else{//if it doesn't fit, make it skinny
+			popup.classList.add("skinny");
+			boundingBox = popup.getBoundingClientRect();
+			if(boundingBox.right > viewportWidth && boundingBox.left - boundingBox.width < 0){//if it will /only/ fit in the viewport if it points to the left, point it to the left
+				popup.classList.remove("show-right");
+				popup.classList.add("show-left");
+			}//otherwise, leave it pointing right; even if it doesn't fit, being off on the right side of the page allows the user to scroll to see the rest of it
+		}
+	}
+	return boundingBox;
+}
+
+function fitPopupVertically(popup, boundingBox){
 	if(boundingBox.top < 0){
 		popup.classList.remove("show-above");
 		popup.classList.add("show-below");
-	}
-}
-function refitBelowPopup(popup, boundingBox){
-	if(boundingBox.bottom > (window.visualViewport? window.visualViewport.height : (window.innerHeight || document.documentElement.clientHeight))){
-		popup.classList.remove("show-below");
-		popup.classList.add("show-above");
-	}
-}
-function refitRightPopup(popup, boundingBox){
-	if(boundingBox.right > (window.visualViewport? window.visualViewport.width : (window.innerWidth || document.documentElement.clientWidth))){
-		popup.classList.remove("show-right");
-		popup.classList.add("show-left");
-	}
-}
-function refitLeftPopup(popup, boundingBox){
-	if(boundingBox.left < 0){
-		popup.classList.remove("show-left");
-		popup.classList.add("show-right");
-	}
+	}//if it still doesn't fit, the user can scroll down
 }
 
 function nestedFootnoteFiller(e){
