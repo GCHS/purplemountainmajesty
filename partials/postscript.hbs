@@ -81,7 +81,10 @@ function showPopup(popup){
 }
 
 function fitPopupHorizontally(popup){
-	let boundingBox = popup.getBoundingClientRect();
+	//the first child of a popup is its architects-line.
+	//We use the bounding box of that element because its x-skew means that the coallated bounding box width for the whole popup is calculated in a weird way,
+	//but the bounding box for the architects-line is, itself, correct, and it is the width of the whole popup.
+	let boundingBox = popup.firstElementChild.getBoundingClientRect();
 	let viewportWidth = window.visualViewport? window.visualViewport.width : (window.innerWidth || document.documentElement.clientWidth);
 	//if it's off the right of the viewport, we've got work to do
 	if(boundingBox.right > viewportWidth){
@@ -90,8 +93,8 @@ function fitPopupHorizontally(popup){
 			popup.classList.add("show-left");
 		}else{//if it doesn't fit, make it skinny
 			popup.classList.add("skinny");
-			boundingBox = popup.getBoundingClientRect();
-			if(boundingBox.right > viewportWidth && boundingBox.left - boundingBox.width < 0){//if it will /only/ fit in the viewport if it points to the left, point it to the left
+			boundingBox = popup.firstElementChild.getBoundingClientRect();
+			if(boundingBox.right > viewportWidth && boundingBox.left - boundingBox.width >= 0){//if it will /only/ fit in the viewport if it points to the left, point it to the left
 				popup.classList.remove("show-right");
 				popup.classList.add("show-left");
 			}//otherwise, leave it pointing right; even if it doesn't fit, being off on the right side of the page allows the user to scroll to see the rest of it
