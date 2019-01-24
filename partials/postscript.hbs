@@ -42,24 +42,28 @@ function hideSiblingFootnotes(f){
 	});
 }
 
-function hideVisibleChildPopupsXorContainingPopup(e){
+function hideVisibleChildPopupsXorContainingPopup(e){//called when popup body is clicked
 	//child popups should only be visible if this popup is visible
 	//if they are, hide them
-	let visibleChildPopups = e.currentTarget.querySelectorAll(".visible");
-	if(visibleChildPopups.length){
-		visibleChildPopups.forEach(hidePopup);
-	}else{
-		hidePopup(e.currentTarget.parentNode);
+	if(!window.getSelection().toString()) {//don't toggle popups on text selection
+		let visibleChildPopups = e.currentTarget.querySelectorAll(".visible");
+		if(visibleChildPopups.length){
+			visibleChildPopups.forEach(hidePopup);
+		}else{
+			hidePopup(e.currentTarget.parentNode);
+		}
 	}
 	e.stopPropagation();
 }
-function footnoteToggler(e){
-	popup = e.currentTarget.querySelector(".popup");
-	if(popup.classList.toggle("visible")){
-		hideSiblingFootnotes(e.currentTarget);
-		showPopup(popup);
-	}else{
-		popup.classList.remove("show-above", "show-below", "show-left", "show-right");		
+function footnoteToggler(e){//called when the footnote tag, `[n]`, is clicked
+	if(!window.getSelection().toString()) {//don't toggle popups on text selection
+		popup = e.currentTarget.querySelector(".popup");
+		if(popup.classList.toggle("visible")){
+			hideSiblingFootnotes(e.currentTarget);
+			showPopup(popup);
+		}else{
+			popup.classList.remove("show-above", "show-below", "show-left", "show-right");		
+		}
 	}
 	e.stopPropagation();
 }
