@@ -1,10 +1,15 @@
 <style>
 	:root{
-		--d: 20px;/*the side length of the bounding box of the diagonal portion of the architect's lines*/
+		--d: 20px; /*the side length of the bounding box of the diagonal portion of the architect's lines*/
 		--d-th: 1.6px; /*the thickness of the diagonal line. Thicker than horizontal to match visual weight.*/
 		--h-th: 1px; /*the thickness of the horizontal line*/
 		--h: 30px; /*the length of horizontal line before the text starts*/
 
+		--footnotation-color: var(--tinged-white-accent-color);
+		--architects-line-color: var(--extra-bright-accent-color);
+
+		--popup-box-bg-color: var(--dark-accent-color);
+		
 		--footnote-font-size:   11.5px;
 		--footnote-line-height: 14px;
 	}
@@ -16,7 +21,7 @@
 		position: relative;
 	}
 	.footnotation{
-		color: var(--tinged-white-accent-color);
+		color: var(--footnotation-color);
 		cursor: pointer;
 	}
 
@@ -36,7 +41,7 @@
 	}
 	architects-line{
 		border-style: solid;
-		border-color: var(--extra-bright-accent-color);
+		border-color: var(--architects-line-color);
 
 		height: var(--d);
 
@@ -44,7 +49,7 @@
 		display: inline-block;
 	}
 	.popup > .popup-box{
-		background-color: var(--dark-accent-color);
+		background-color: var(--popup-box-bg-color);
 		padding-left: 1ch;
 		padding-right: 1ch;
 		min-width: 20em;
