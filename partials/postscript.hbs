@@ -27,8 +27,9 @@ function hideFootnote(f){
 }
 function hidePopup(p){
 	p.classList.remove(
-		"visible", "show-above", "show-below", "show-left", "show-right", "shorter-horizontal-line", "skinny"
+		"visible", "show-above", "show-below", "show-left", "show-right", "skinny"
 	);
+	p.querySelector(".popup-box").style.removeProperty("min-width");
 }
 
 function hideSiblingFootnotes(f){
@@ -75,28 +76,46 @@ function showPopup(popup){
 }
 
 function fitPopupHorizontally(popup){
-	tryFitPopupHorizontally(popup, ["shorter-horizontal-line", "skinny", "skin-and-bones"]);
-}
-function tryFitPopupHorizontally(popup, classesToTry){
 	let viewportWidth = window.visualViewport? window.visualViewport.width : (window.innerWidth || document.documentElement.clientWidth);
-	for(let i=0; !tryFitPopupWithHorizontalFlip(popup, viewportWidth) && i<classesToTry.length; i++){
-		popup.classList.add(classesToTry[i]);
+	
+	let box = popup.querySelector(".popup-box");
+	let boxComputedStyle = window.getComputedStyle(box, null);
+	let boxInnerWidth = parseFloat(boxComputedStyle.getPropertyValue("width"));
+	let contentWidth = popup.querySelector(".popup-content").getBoundingClientRect().width;
+
+	if(contentWidth < boxInnerWidth){
+		box.style.minWidth = contentWidth + "px";
 	}
-}
-function tryFitPopupWithHorizontalFlip(popup, maxRightCoord){
+
 	//The first child of a popup is its architects-line.
 	//We use the bounding box of that element because its x-skew means that the coallated bounding box width for the whole popup is calculated in a weird way,
 	//but the bounding box for the architects-line is, itself, correct, and it is the width of the whole popup.
-	let boundingBox = popup.firstElementChild.getBoundingClientRect();
-	if(boundingBox.right <= maxRightCoord){//it fits!
-		return true;
-	}else{
-		if(boundingBox.left - boundingBox.width >= 0){//if it will fit if it points to the left, point it to the left
+	let lineBounds = popup.firstElementChild.getBoundingClientRect();
+	if(lineBounds.right > viewportWidth){//it's off to the right, let's see if we can get it back onscreen
+		if(lineBounds.left - lineBounds.width >= 0){//if it will fit if it points to the left, point it to the left
 			popup.classList.remove("show-right");
 			popup.classList.add("show-left");
-			return true;
-		}else{
-			return false;
+		}else{//it won't fit pointed to the left, so we gotta make it skinnier
+			box.style.removeProperty("min-width");
+			popup.classList.add("skinny");
+			lineBounds = popup.firstElementChild.getBoundingClientRect();
+			let lineWidthOutsideBoxContent = lineBounds.width - boxInnerWidth;
+			if(lineBounds.left > viewportWidth/2){//if the origin's on the right side of the screen, point it left
+				popup.classList.remove("show-right");
+				popup.classList.add("show-left");
+				lineBounds = popup.firstElementChild.getBoundingClientRect();
+				box.style.minWidth = (lineBounds.right - lineWidthOutsideBoxContent) + "px";
+			}else{//it's on the left; leave it pointing right
+				box.style.minWidth = (viewportWidth - lineBounds.left - lineWidthOutsideBoxContent) + "px";
+			}
+			boxInnerWidth = parseFloat(boxComputedStyle.getPropertyValue("width"))
+			if(contentWidth < boxInnerWidth){
+				box.style.minWidth = contentWidth + "px";
+			}
+			if(box.getBoundingClientRect().left < 0){//if it's /still/ off to the left, point the thing back to the right so the user can at least scroll to see it.
+				popup.classList.remove("show-left");
+				popup.classList.add("show-right");
+			}
 		}
 	}
 }
@@ -123,14 +142,17 @@ function fillFootnoteTag(tag){
 	let popup = document.createElement("span");
 	popup.classList.add("popup");
 	popup.appendChild(document.createElement("architects-line"));
-	let content = document.createElement("div");
+	let box = document.createElement("div");
+	box.classList.add("popup-box");
+	box.onclick = hideVisibleChildPopupsXorContainingPopup;
+	let content = document.createElement("span");
 	content.classList.add("popup-content");
-	content.onclick = hideVisibleChildPopupsXorContainingPopup;
 	footernote.childNodes.forEach(node => {
 		content.appendChild(node.cloneNode(true));
 	});
 	content.querySelectorAll(".footnote").forEach(hideFootnote);
-	popup.appendChild(content);
+	popup.appendChild(box);
+	box.appendChild(content);
 	popup.querySelectorAll(".footnote-ref").forEach(f => {
 		unanchorTag(f);
 		f.onclick = nestedFootnoteFiller;
