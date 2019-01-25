@@ -17,9 +17,14 @@ window.onclick = ()=>{document.querySelectorAll(".footnote").forEach(hideFootnot
 //nested footnotes are done on demand because I make directed cyclic graphs out of them.
 //you've been warned.
 {
+	let footnoteSeparator = document.querySelector(".footnotes-sep");
+	if(footnoteSeparator){
+		footnoteSeparator.classList.add("collapsed");
+	}
 	let footnotes = document.querySelector(".footnotes");
-	if(footnotes)
+	if(footnotes){
 		footnotes.classList.add("collapsed");//they're redundant now; hide them
+	}
 }
 
 function hideFootnote(f){
