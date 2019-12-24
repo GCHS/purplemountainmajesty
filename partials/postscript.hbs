@@ -97,7 +97,7 @@ function fitPopupHorizontally(popup){
 	//but the bounding box for the architects-line is, itself, correct, and it is the width of the whole popup.
 	let lineBounds = popup.firstElementChild.getBoundingClientRect();
 	if(lineBounds.right > viewportWidth){//it's off to the right, let's see if we can get it back onscreen
-		if(lineBounds.left - lineBounds.width >= 0){//if it will fit if it points to the left, point it to the left
+		if(lineBounds.left >= lineBounds.width){//if it will fit if it points to the left, point it to the left
 			popup.classList.remove("show-right");
 			popup.classList.add("show-left");
 		}else{//it won't fit pointed to the left, so we gotta make it skinnier
